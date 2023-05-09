@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.33627.172
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Foods.Infrastructure.API", "Foods.Infrastructure.API\Foods.Infrastructure.API.csproj", "{C297B012-6433-40BD-AC62-C4D867D927F6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Foods.Domain", "Foods.Domain\Foods.Domain.csproj", "{37714B65-9A85-4EC4-AAD1-556EA9A7BA92}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C297B012-6433-40BD-AC62-C4D867D927F6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C297B012-6433-40BD-AC62-C4D867D927F6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C297B012-6433-40BD-AC62-C4D867D927F6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C297B012-6433-40BD-AC62-C4D867D927F6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{37714B65-9A85-4EC4-AAD1-556EA9A7BA92}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{37714B65-9A85-4EC4-AAD1-556EA9A7BA92}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{37714B65-9A85-4EC4-AAD1-556EA9A7BA92}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{37714B65-9A85-4EC4-AAD1-556EA9A7BA92}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {958A2F48-C4CD-49FD-BAD7-B440EEC96681}
+	EndGlobalSection
+EndGlobal
