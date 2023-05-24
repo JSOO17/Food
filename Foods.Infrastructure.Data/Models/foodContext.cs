@@ -120,16 +120,7 @@ namespace Foods.Infrastructure.Data.Models
 
             modelBuilder.Entity<Orderdish>(entity =>
             {
-                entity.HasNoKey();
-
                 entity.ToTable("orderdishes");
-
-                entity.HasIndex(e => e.DishId, "orderdishes_DishId_IDX");
-
-                entity.HasIndex(e => e.OrderId, "orderdishes_OrderId_IDX");
-
-                entity.HasIndex(e => new { e.OrderId, e.DishId }, "orderdishes_un")
-                    .IsUnique();
 
                 entity.Property(e => e.Cuantity).HasColumnType("bigint(20)");
 

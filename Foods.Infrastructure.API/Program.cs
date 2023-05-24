@@ -36,6 +36,10 @@ builder.Services.AddTransient<IDishPersistencePort, DishAdapter>();
 builder.Services.AddTransient<IDishServicesPort, DishUsercases>();
 builder.Services.AddTransient<IDishServices, DishServices>();
 
+builder.Services.AddTransient<IOrderPersistencePort, OrderAdapter>();
+builder.Services.AddTransient<IOrderServicesPort, OrderUsecases>();
+builder.Services.AddTransient<IOrderServices, OrderServices>();
+
 builder.Services.AddHttpClient<IUserMicroHttpClient, UserMicroHttpClient>(client =>
 {
     client.BaseAddress = new Uri("https://localhost:7019/");
