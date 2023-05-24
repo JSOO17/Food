@@ -14,35 +14,19 @@ namespace Foods.Infrastructure.Data.Adapters
         {
             _foodContext = foodContext;
         }
-        public async Task<List<CategoryDishesModel>> GetDishes(int page, int count, long restaurantId)
+
+        public async Task<List<DishModel>> GetDishes(int page, int count, long restaurantId)
         {
             var skip = page > 1 ? count * (page - 1) : 0;
 
-            var categories = await (from dish in _foodContext.Dishes
-                                    join category in _foodContext.Categories on dish.CategoryId equals category.Id
-                                    where dish.RestaurantId == restaurantId
-                                    select category)
-                                    .Distinct()
+            var dishes = await _foodContext.Dishes
+                                    .Where(d => d.RestaurantId == restaurantId)
                                     .Skip(skip)
                                     .Take(count)
+                                    .OrderBy(d => d.CategoryId)
                                     .ToListAsync();
 
-            var dishes = new List<CategoryDishesModel>();
-
-            categories.ForEach(c =>
-                        {
-                            var dish = _foodContext.Dishes.Where(d => d.RestaurantId == restaurantId && d.CategoryId == c.Id).ToList();
-                            if (dish.Any())
-                            {
-
-                                dishes.Add(new CategoryDishesModel
-                                {
-                                    NameCategory = c.Name,
-                                    Dishes = DishMapper.ToModel(dish)
-                                });
-                            }
-                        });
-            return dishes;
+            return DishMapper.ToModel(dishes);
         }
 
         public async Task<DishModel> CreateDish(DishModel dishModel)

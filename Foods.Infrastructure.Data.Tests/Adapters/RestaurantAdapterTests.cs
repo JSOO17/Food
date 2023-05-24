@@ -3,11 +3,6 @@ using Foods.Infrastructure.Data.Adapters;
 using Foods.Infrastructure.Data.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Foods.Infrastructure.Data.Tests.Adapters
 {
@@ -113,6 +108,8 @@ namespace Foods.Infrastructure.Data.Tests.Adapters
 
             Assert.AreEqual("test Restaurant2", restaurants[0].Name);
             Assert.AreEqual("whatever.com/test2.png", restaurants[0].UrlLogo);
+
+            await CleanUp();
         }
 
         [TestMethod]

@@ -3,12 +3,12 @@ using Foods.Application.DTO.Response;
 using Foods.Application.Services.Interfaces;
 using Foods.Domain.Exceptions;
 using Foods.Domain.HttpClients.Interfaces;
-using Foods.Domain.Models;
 using Foods.Infrastructure.API.Controllers;
-using Foods.Infrastructure.Data.Models;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
+using System.Net;
 
 namespace Foods.Infrastructure.API.Tests.Controllers
 {
@@ -20,7 +20,11 @@ namespace Foods.Infrastructure.API.Tests.Controllers
         {
             var mockDishServices = new Mock<IDishServices>();
             var mockLogger = new Mock<ILogger<DishController>>();
-            var mockserMicroHttpClient = new Mock<IUserMicroHttpClient>();
+            var mockUserMicroHttpClient = new Mock<IUserMicroHttpClient>();
+
+            mockUserMicroHttpClient
+                .Setup(p => p.PostAsync(It.IsAny<string>(), It.IsAny<HttpContent>()))
+                .Returns(Task.FromResult(new HttpResponseMessage { StatusCode = HttpStatusCode.OK, Content = null }));
 
             mockDishServices
                 .Setup(p => p.CreateDish(It.IsAny<DishRequestDTO>()))
@@ -36,7 +40,16 @@ namespace Foods.Infrastructure.API.Tests.Controllers
                     UrlImagen = "whatever.com/test.png"
                 }));
 
-            var controller = new DishController(mockDishServices.Object, mockLogger.Object, mockserMicroHttpClient.Object);
+            var httpContext = new DefaultHttpContext();
+            httpContext.Request.Headers["Authorization"] = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9lbWFpbGFkZHJlc3MiOiJkdXJhbnBAZ21haWwuY29tIiwiaHR0cDovL3NjaGVtYXMubWljcm9zb2Z0LmNvbS93cy8yMDA4LzA2L2lkZW50aXR5L2NsYWltcy9yb2xlIjoiMiIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL25hbWUiOiJ5dW5lbmZpIiwiaHR0cDovL3NjaGVtYXMueG1sc29hcC5vcmcvd3MvMjAwNS8wNS9pZGVudGl0eS9jbGFpbXMvbmFtZWlkZW50aWZpZXIiOiIzIiwiZXhwIjoxNjg0NDQxMTM5fQ.e2KrEkNGRn2eRp14RTWcx3B0JfxXsBxrdeuMQKup98c";
+
+            var controller = new DishController(mockDishServices.Object, mockLogger.Object, mockUserMicroHttpClient.Object)
+            {
+                ControllerContext = new ControllerContext()
+                {
+                    HttpContext = httpContext
+                }
+            };
 
             var dishRequest = new DishRequestDTO
             {
@@ -107,13 +120,27 @@ namespace Foods.Infrastructure.API.Tests.Controllers
         {
             var mockDishServices = new Mock<IDishServices>();
             var mockLogger = new Mock<ILogger<DishController>>();
-            var mockserMicroHttpClient = new Mock<IUserMicroHttpClient>();
+            var mockUserMicroHttpClient = new Mock<IUserMicroHttpClient>();
+
+            mockUserMicroHttpClient
+               .Setup(p => p.PostAsync(It.IsAny<string>(), It.IsAny<HttpContent>()))
+               .Returns(Task.FromResult(new HttpResponseMessage { StatusCode = HttpStatusCode.OK, Content = null }));
+
 
             mockDishServices
                 .Setup(p => p.CreateDish(It.IsAny<DishRequestDTO>()))
                 .Throws(new ValidationModelException("name is required"));
 
-            var controller = new DishController(mockDishServices.Object, mockLogger.Object, mockserMicroHttpClient.Object);
+            var httpContext = new DefaultHttpContext();
+            httpContext.Request.Headers["Authorization"] = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9lbWFpbGFkZHJlc3MiOiJkdXJhbnBAZ21haWwuY29tIiwiaHR0cDovL3NjaGVtYXMubWljcm9zb2Z0LmNvbS93cy8yMDA4LzA2L2lkZW50aXR5L2NsYWltcy9yb2xlIjoiMiIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL25hbWUiOiJ5dW5lbmZpIiwiaHR0cDovL3NjaGVtYXMueG1sc29hcC5vcmcvd3MvMjAwNS8wNS9pZGVudGl0eS9jbGFpbXMvbmFtZWlkZW50aWZpZXIiOiIzIiwiZXhwIjoxNjg0NDQxMTM5fQ.e2KrEkNGRn2eRp14RTWcx3B0JfxXsBxrdeuMQKup98c";
+
+            var controller = new DishController(mockDishServices.Object, mockLogger.Object, mockUserMicroHttpClient.Object)
+            {
+                ControllerContext = new ControllerContext()
+                {
+                    HttpContext = httpContext
+                }
+            };
 
             var dishRequest = new DishRequestDTO
             {
@@ -143,7 +170,11 @@ namespace Foods.Infrastructure.API.Tests.Controllers
         {
             var mockDishServices = new Mock<IDishServices>();
             var mockLogger = new Mock<ILogger<DishController>>();
-            var mockserMicroHttpClient = new Mock<IUserMicroHttpClient>();
+            var mockUserMicroHttpClient = new Mock<IUserMicroHttpClient>();
+
+            mockUserMicroHttpClient
+                .Setup(p => p.PostAsync(It.IsAny<string>(), It.IsAny<HttpContent>()))
+                .Returns(Task.FromResult(new HttpResponseMessage { StatusCode = HttpStatusCode.OK, Content = null }));
 
             mockDishServices
                 .Setup(p => p.CreateDish(It.IsAny<DishRequestDTO>()))
@@ -159,7 +190,16 @@ namespace Foods.Infrastructure.API.Tests.Controllers
                     UrlImagen = "whatever.com/test.png"
                 }));
 
-            var controller = new DishController(mockDishServices.Object, mockLogger.Object, mockserMicroHttpClient.Object);
+            var httpContext = new DefaultHttpContext();
+            httpContext.Request.Headers["Authorization"] = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9lbWFpbGFkZHJlc3MiOiJkdXJhbnBAZ21haWwuY29tIiwiaHR0cDovL3NjaGVtYXMubWljcm9zb2Z0LmNvbS93cy8yMDA4LzA2L2lkZW50aXR5L2NsYWltcy9yb2xlIjoiMiIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL25hbWUiOiJ5dW5lbmZpIiwiaHR0cDovL3NjaGVtYXMueG1sc29hcC5vcmcvd3MvMjAwNS8wNS9pZGVudGl0eS9jbGFpbXMvbmFtZWlkZW50aWZpZXIiOiIzIiwiZXhwIjoxNjg0NDQxMTM5fQ.e2KrEkNGRn2eRp14RTWcx3B0JfxXsBxrdeuMQKup98c";
+
+            var controller = new DishController(mockDishServices.Object, mockLogger.Object, mockUserMicroHttpClient.Object)
+            {
+                ControllerContext = new ControllerContext()
+                {
+                    HttpContext = httpContext
+                }
+            };
 
             var dishRequest = new DishRequestDTO
             {
@@ -228,12 +268,7 @@ namespace Foods.Infrastructure.API.Tests.Controllers
 
             mockDishServices
                 .Setup(p => p.GetDishes(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<long>()))
-                .Returns(Task.FromResult(new List<CategoryDishesResponseDTO>
-                {
-                    new CategoryDishesResponseDTO
-                    {
-                        NameCategory = "xdf",
-                        Dishes = new List<DishResponseDTO>
+                .Returns(Task.FromResult(new List<DishResponseDTO>
                         {
                             new DishResponseDTO
                             {
@@ -246,30 +281,27 @@ namespace Foods.Infrastructure.API.Tests.Controllers
                                 RestaurantId = 1,
                                 UrlImagen = "whatever.com/test.png"
                             }
-                        }
-                    }
-                }));
+                        }));
 
             var controller = new DishController(mockDishServices.Object, mockLogger.Object, mockserMicroHttpClient.Object);
 
             var response = (OkObjectResult)await controller.GetDishes(1, 1, 1);
 
             Assert.AreEqual(200, response.StatusCode);
-            Assert.IsInstanceOfType(response.Value, typeof(List<CategoryDishesResponseDTO>));
+            Assert.IsInstanceOfType(response.Value, typeof(List<DishResponseDTO>));
 
-            var dishes = response.Value as List<CategoryDishesResponseDTO>;
+            var dishes = response.Value as List<DishResponseDTO>;
 
             Assert.IsNotNull(dishes);
             Assert.AreEqual(1, dishes.Count);
-            Assert.AreEqual(1, dishes[0].Dishes.Count);
-            Assert.AreEqual("xdf", dishes[0].NameCategory);
-            Assert.AreEqual("test dish", dishes[0].Dishes[0].Name);
-            Assert.AreEqual("to testing", dishes[0].Dishes[0].Description);
-            Assert.AreEqual(1, dishes[0].Dishes[0].CategoryId);
-            Assert.IsTrue(dishes[0].Dishes[0].IsActive);
-            Assert.AreEqual(1, dishes[0].Dishes[0].Price);
-            Assert.AreEqual(1, dishes[0].Dishes[0].RestaurantId);
-            Assert.AreEqual("whatever.com/test.png", dishes[0].Dishes[0].UrlImagen);
+
+            Assert.AreEqual("test dish", dishes[0].Name);
+            Assert.AreEqual("to testing", dishes[0].Description);
+            Assert.AreEqual(1, dishes[0].CategoryId);
+            Assert.IsTrue(dishes[0].IsActive);
+            Assert.AreEqual(1, dishes[0].Price);
+            Assert.AreEqual(1, dishes[0].RestaurantId);
+            Assert.AreEqual("whatever.com/test.png", dishes[0].UrlImagen);
         }
 
         [TestMethod]

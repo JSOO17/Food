@@ -30,7 +30,7 @@ namespace Foods.Application.Services
             return DishMapper.ToDishResponse(dish);
         }
 
-        public async Task<List<CategoryDishesResponseDTO>> GetDishes(int page, int count, long restaurantId)
+        public async Task<List<DishResponseDTO>> GetDishes(int page, int count, long restaurantId)
         {
             var dishes = await _dishServicesPort.GetDishes(page, count, restaurantId);
 

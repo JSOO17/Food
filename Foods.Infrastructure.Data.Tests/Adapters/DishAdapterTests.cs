@@ -124,7 +124,7 @@ namespace Foods.Infrastructure.Data.Tests.Adapters
             var dish = await adapter.CreateDish(dishModel);
 
             Assert.IsNotNull(dish);
-            Assert.AreEqual(3, dish.Id);
+            Assert.AreEqual(6, dish.Id);
             Assert.AreEqual("test dish3", dish.Name);
             Assert.AreEqual("to testing3", dish.Description);
             Assert.AreEqual(3, dish.CategoryId);
@@ -161,13 +161,13 @@ namespace Foods.Infrastructure.Data.Tests.Adapters
 
             Assert.IsNotNull(dish);
             Assert.AreEqual(2, dish.Id);
-            Assert.AreEqual("test dish1", dish.Name);
+            Assert.AreEqual("test dish2", dish.Name);
             Assert.AreEqual("to testing updated", dish.Description);
-            Assert.AreEqual(1, dish.CategoryId);
+            Assert.AreEqual(2, dish.CategoryId);
             Assert.IsFalse(dish.IsActive);
             Assert.AreEqual(4, dish.Price);
             Assert.AreEqual(1, dish.RestaurantId);
-            Assert.AreEqual("whatever.com/test.png", dish.UrlImagen);
+            Assert.AreEqual("whatever2.com/test.png", dish.UrlImagen);
 
             await CleanUp();
         }
@@ -180,28 +180,33 @@ namespace Foods.Infrastructure.Data.Tests.Adapters
 
             var adapter = new DishAdapter(_context);
 
-            var dishes = await adapter.GetDishes(1, 2, 1);
+            var dishes = await adapter.GetDishes(1, 3, 1);
 
-            Assert.AreEqual(2, dishes.Count);
-            Assert.IsNotNull(dishes[0]);
-            Assert.AreEqual("categoryTest1", dishes[0].NameCategory);
-            Assert.AreEqual(2, dishes[0].Dishes.Count);
+            Assert.AreEqual(3, dishes.Count);
 
-            Assert.AreEqual("test dish", dishes[0].Dishes[0].Name);
-            Assert.AreEqual("to testing", dishes[0].Dishes[0].Description);
-            Assert.AreEqual(1, dishes[0].Dishes[0].CategoryId);
-            Assert.IsTrue(dishes[0].Dishes[0].IsActive);
-            Assert.AreEqual(1, dishes[0].Dishes[0].Price);
-            Assert.AreEqual(1, dishes[0].Dishes[0].RestaurantId);
-            Assert.AreEqual("whatever.com/test.png", dishes[0].Dishes[0].UrlImagen);
+            Assert.AreEqual("test dish", dishes[0].Name);
+            Assert.AreEqual("to testing", dishes[0].Description);
+            Assert.AreEqual(1, dishes[0].CategoryId);
+            Assert.IsTrue(dishes[0].IsActive);
+            Assert.AreEqual(1, dishes[0].Price);
+            Assert.AreEqual(1, dishes[0].RestaurantId);
+            Assert.AreEqual("whatever.com/test.png", dishes[0].UrlImagen);
 
-            Assert.AreEqual("test dish3", dishes[0].Dishes[1].Name);
-            Assert.AreEqual("to testing3", dishes[0].Dishes[1].Description);
-            Assert.AreEqual(1, dishes[0].Dishes[1].CategoryId);
-            Assert.IsTrue(dishes[0].Dishes[1].IsActive);
-            Assert.AreEqual(3, dishes[0].Dishes[1].Price);
-            Assert.AreEqual(1, dishes[0].Dishes[1].RestaurantId);
-            Assert.AreEqual("whatever3.com/test.png", dishes[0].Dishes[1].UrlImagen);
+            Assert.AreEqual("test dish3", dishes[1].Name);
+            Assert.AreEqual("to testing3", dishes[1].Description);
+            Assert.AreEqual(1, dishes[1].CategoryId);
+            Assert.IsTrue(dishes[1].IsActive);
+            Assert.AreEqual(3, dishes[1].Price);
+            Assert.AreEqual(1, dishes[1].RestaurantId);
+            Assert.AreEqual("whatever3.com/test.png", dishes[1].UrlImagen);
+
+            Assert.AreEqual("test dish2", dishes[2].Name);
+            Assert.AreEqual("to testing2", dishes[2].Description);
+            Assert.AreEqual(2, dishes[2].CategoryId);
+            Assert.IsTrue(dishes[2].IsActive);
+            Assert.AreEqual(2, dishes[2].Price);
+            Assert.AreEqual(1, dishes[2].RestaurantId);
+            Assert.AreEqual("whatever2.com/test.png", dishes[2].UrlImagen);
 
             await CleanUp();
         }
@@ -214,20 +219,25 @@ namespace Foods.Infrastructure.Data.Tests.Adapters
 
             var adapter = new DishAdapter(_context);
 
-            var dishes = await adapter.GetDishes(2, 2, 1);
+            var dishes = await adapter.GetDishes(2, 3, 1);
 
-            Assert.AreEqual(1, dishes.Count);
-            Assert.IsNotNull(dishes[0]);
-            Assert.AreEqual("categoryTest3", dishes[0].NameCategory);
-            Assert.AreEqual(1, dishes[0].Dishes.Count);
+            Assert.AreEqual(2, dishes.Count);
 
-            Assert.AreEqual("test dish5", dishes[0].Dishes[0].Name);
-            Assert.AreEqual("to testing5", dishes[0].Dishes[0].Description);
-            Assert.AreEqual(3, dishes[0].Dishes[0].CategoryId);
-            Assert.IsTrue(dishes[0].Dishes[0].IsActive);
-            Assert.AreEqual(1, dishes[0].Dishes[0].Price);
-            Assert.AreEqual(1, dishes[0].Dishes[0].RestaurantId);
-            Assert.AreEqual("whatever5.com/test.png", dishes[0].Dishes[0].UrlImagen);
+            Assert.AreEqual("test dish4", dishes[0].Name);
+            Assert.AreEqual("to testing4", dishes[0].Description);
+            Assert.AreEqual(2, dishes[0].CategoryId);
+            Assert.IsTrue(dishes[0].IsActive);
+            Assert.AreEqual(1, dishes[0].Price);
+            Assert.AreEqual(1, dishes[0].RestaurantId);
+            Assert.AreEqual("whatever4.com/test.png", dishes[0].UrlImagen);
+
+            Assert.AreEqual("test dish5", dishes[1].Name);
+            Assert.AreEqual("to testing5", dishes[1].Description);
+            Assert.AreEqual(3, dishes[1].CategoryId);
+            Assert.IsTrue(dishes[1].IsActive);
+            Assert.AreEqual(1, dishes[1].Price);
+            Assert.AreEqual(1, dishes[1].RestaurantId);
+            Assert.AreEqual("whatever5.com/test.png", dishes[1].UrlImagen);
 
             await CleanUp();
         }

@@ -23,7 +23,7 @@ namespace Foods.Domain.UserCases
             return await _dishPersistence.CreateDish(dish);
         }
 
-        public async Task<List<CategoryDishesModel>> GetDishes(int page, int count, long restaurantId)
+        public async Task<List<DishModel>> GetDishes(int page, int count, long restaurantId)
         {
             return await _dishPersistence.GetDishes(page, count, restaurantId);
         }

@@ -2,6 +2,7 @@
 using Foods.Application.DTO.Request;
 using Foods.Application.DTO.Response;
 using Foods.Domain.Models;
+using System.Collections.Generic;
 
 namespace Foods.Application.Mappers
 {
@@ -12,8 +13,17 @@ namespace Foods.Application.Mappers
             var config = new MapperConfiguration(cfg => cfg.CreateMap<DishModel, DishResponseDTO>());
 
             var mapper = new Mapper(config);
-
+            
             return mapper.Map<DishModel, DishResponseDTO>(user);
+        }
+
+        public static List<DishResponseDTO> ToDishResponse(List<DishModel> dishes)
+        {
+            var config = new MapperConfiguration(cfg => cfg.CreateMap<DishModel, DishResponseDTO>());
+
+            var mapper = new Mapper(config);
+            
+            return mapper.Map<List<DishModel>, List<DishResponseDTO>>(dishes);
         }
 
         public static DishModel ToDishModel(DishRequestDTO user)

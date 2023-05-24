@@ -14,6 +14,10 @@ namespace Foods.Infrastructure.API.Controllers
     {
         private readonly IUserMicroHttpClient _userHttpClient;
 
+        protected const string MessageForbbiden = "forbbiden. Errors: {0}";
+        protected const string MessageUnauthorized = "Unauthorized. Errors: {0}";
+        protected const string MessageBadRequest = "bad request. Errors: {0}";
+
         public BaseController(IUserMicroHttpClient userMicroHttpClient)
         {
             _userHttpClient = userMicroHttpClient;

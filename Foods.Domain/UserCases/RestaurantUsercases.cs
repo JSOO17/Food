@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using Foods.Domain.Exceptions;
 using Foods.Domain.Interfaces.API;
 using Foods.Domain.Interfaces.SPI;
 using Foods.Domain.Models;
@@ -19,7 +20,7 @@ namespace Foods.Domain.UserCases
         {
             if (!await _restaurantPersistencePort.IsOwnerByRestaurant(model.RestaurantId, userId))
             {
-                throw new Exception();
+                throw new RoleHasNotPermissionException("You are not the owner of the restaurant");
             }
 
             ValidateRestaurantEmployee(model);

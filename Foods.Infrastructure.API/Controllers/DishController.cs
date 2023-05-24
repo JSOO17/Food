@@ -15,8 +15,6 @@ namespace Foods.Infrastructure.API.Controllers
     [ApiController]
     public class DishController : BaseController
     {
-        private const string MessageForbbiden = "forbbiden. Errors: {0}";
-
         private readonly IDishServices _dishServices;
         private readonly ILogger<DishController> _logger;
 
@@ -40,7 +38,7 @@ namespace Foods.Infrastructure.API.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError("Something was wrong", ex);
+                _logger.LogError(ex, "Something was wrong");
 
                 return StatusCode(500, new ApiResult
                 {
@@ -67,6 +65,12 @@ namespace Foods.Infrastructure.API.Controllers
                 return Ok(dishResponse);
 
             }
+            catch (TokenIsNotValidException ex)
+            {
+                _logger.LogDebug("Unauthorized. Errors: {0}", ex.Message);
+
+                return StatusCode(401, ex.Message);
+            }
             catch (RoleHasNotPermissionException ex)
             {
                 _logger.LogDebug(MessageForbbiden, ex.Message);
@@ -85,7 +89,7 @@ namespace Foods.Infrastructure.API.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError("Something was wrong", ex);
+                _logger.LogError(ex, "Something was wrong");
 
                 return StatusCode(500, new ApiResult
                 {
@@ -116,6 +120,12 @@ namespace Foods.Infrastructure.API.Controllers
                 });
 
             }
+            catch (TokenIsNotValidException ex)
+            {
+                _logger.LogDebug("Unauthorized. Errors: {0}", ex.Message);
+
+                return StatusCode(401, ex.Message);
+            }
             catch (RoleHasNotPermissionException ex)
             {
                 _logger.LogDebug(MessageForbbiden, ex.Message);
@@ -134,7 +144,7 @@ namespace Foods.Infrastructure.API.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError("Something was wrong", ex);
+                _logger.LogError(ex, "Something was wrong");
 
                 return StatusCode(500, new ApiResult
                 {

@@ -1,6 +1,7 @@
 ﻿using FluentValidation;
 using Foods.Application.DTO.Request;
 using Foods.Application.Services.Interfaces;
+using Foods.Domain.Exceptions;
 using Foods.Domain.HttpClients.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -36,7 +37,7 @@ namespace Foods.Infrastructure.API.Controllers
             }
             catch(Exception ex)
             {
-                _logger.LogError("Something was wrong", ex);
+                _logger.LogError(ex, "Something was wrong");
 
                 return StatusCode(500, new ApiResult
                 {
@@ -68,6 +69,16 @@ namespace Foods.Infrastructure.API.Controllers
 
                 return Ok(restaurantNew);
             }
+            catch (TokenIsNotValidException ex)
+            {
+                _logger.LogDebug(MessageUnauthorized, ex.Message);
+
+                return StatusCode(401, new ApiResult
+                {
+                    StatusCode = 401,
+                    Message = $"Errors: {ex.Message}"
+                });
+            }
             catch (ValidationException ex)
             {
                 _logger.LogDebug("bad request. Errors: {0}", ex.Message);
@@ -80,7 +91,7 @@ namespace Foods.Infrastructure.API.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError("Something was wrong", ex);
+                _logger.LogError(ex, "Something was wrong");
 
                 return StatusCode(500, new ApiResult
                 {
@@ -104,23 +115,43 @@ namespace Foods.Infrastructure.API.Controllers
 
                 return Ok(restaurantEmployee);
             }
+            catch (TokenIsNotValidException ex)
+            {
+                _logger.LogDebug(MessageUnauthorized, ex.Message);
+
+                return StatusCode(StatusCodes.Status401Unauthorized, new ApiResult
+                {
+                    StatusCode = StatusCodes.Status401Unauthorized,
+                    Message = $"Errors: {ex.Message}"
+                });
+            }
+            catch (RoleHasNotPermissionException ex)
+            {
+                _logger.LogDebug(MessageForbbiden, ex.Message);
+
+                return StatusCode(StatusCodes.Status403Forbidden, new ApiResult
+                {
+                    StatusCode = StatusCodes.Status403Forbidden,
+                    Message = $"Errors: {ex.Message}"
+                });
+            }
             catch (ValidationException ex)
             {
                 _logger.LogDebug("bad request. Errors: {0}", ex.Message);
 
                 return BadRequest(new ApiResult
                 {
-                    StatusCode = 400,
+                    StatusCode = StatusCodes.Status400BadRequest,
                     Message = $"Errors: {ex.Message}"
                 });
             }
             catch (Exception ex)
             {
-                _logger.LogError("Something was wrong", ex);
+                _logger.LogError(ex, "Something was wrong");
 
-                return StatusCode(500, new ApiResult
+                return StatusCode(StatusCodes.Status500InternalServerError, new ApiResult
                 {
-                    StatusCode = 500,
+                    StatusCode = StatusCodes.Status500InternalServerError,
                     Message = "Something was wrong"
                 });
             }

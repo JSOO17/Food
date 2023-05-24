@@ -60,12 +60,7 @@ namespace Foods.Application.Tests.Services
 
             servicesPort
                 .Setup(p => p.GetDishes(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<long>()))
-                .Returns(Task.FromResult(new List<CategoryDishesModel>
-                {
-                    new CategoryDishesModel
-                    {
-                        NameCategory = "xdf",
-                        Dishes = new List<DishModel>
+                .Returns(Task.FromResult(new List<DishModel>
                         {
                             new DishModel
                             {
@@ -78,9 +73,7 @@ namespace Foods.Application.Tests.Services
                                 RestaurantId = 1,
                                 UrlImagen = "whatever.com/test.png"
                             }
-                        }
-                    }
-                }));
+                        }));
 
             var services = new DishServices(servicesPort.Object);
 
@@ -88,15 +81,14 @@ namespace Foods.Application.Tests.Services
 
             Assert.IsNotNull(dishes);
             Assert.AreEqual(1, dishes.Count);
-            Assert.AreEqual(1, dishes[0].Dishes.Count);
-            Assert.AreEqual("xdf", dishes[0].NameCategory);
-            Assert.AreEqual("test dish", dishes[0].Dishes[0].Name);
-            Assert.AreEqual("to testing", dishes[0].Dishes[0].Description);
-            Assert.AreEqual(1, dishes[0].Dishes[0].CategoryId);
-            Assert.IsTrue(dishes[0].Dishes[0].IsActive);
-            Assert.AreEqual(1, dishes[0].Dishes[0].Price);
-            Assert.AreEqual(1, dishes[0].Dishes[0].RestaurantId);
-            Assert.AreEqual("whatever.com/test.png", dishes[0].Dishes[0].UrlImagen);
+
+            Assert.AreEqual("test dish", dishes[0].Name);
+            Assert.AreEqual("to testing", dishes[0].Description);
+            Assert.AreEqual(1, dishes[0].CategoryId);
+            Assert.IsTrue(dishes[0].IsActive);
+            Assert.AreEqual(1, dishes[0].Price);
+            Assert.AreEqual(1, dishes[0].RestaurantId);
+            Assert.AreEqual("whatever.com/test.png", dishes[0].UrlImagen);
         }
     }
 }
