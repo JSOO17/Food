@@ -46,5 +46,14 @@ namespace Foods.Infrastructure.Data.Mappers
 
             return mapper.Map<List<Orderdish>, List<OrderDishModel>>(order);
         }
+
+        public static List<OrderModel> ToModel(List<Order> order)
+        {
+            var config = new MapperConfiguration(cfg => cfg.CreateMap<Order, OrderModel>());
+
+            var mapper = new Mapper(config);
+
+            return mapper.Map<List<Order>, List<OrderModel>>(order);
+        }
     }
 }

@@ -8,5 +8,6 @@ namespace Foods.Domain.Interfaces.SPI
         Task<RestaurantEmployeesModel> CreateEmployeeRestaurant(RestaurantEmployeesModel restaurant);
         Task<bool> IsOwnerByRestaurant(long RestaurantId, long userId);
         Task<List<ItemRestaurantModel>> GetRestaurants(int page, int count);
+        Task<RestaurantModel?> GetRestaurantByEmployeeId(long employeeId);
     }
 }

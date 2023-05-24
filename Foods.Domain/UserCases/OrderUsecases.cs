@@ -10,10 +10,12 @@ namespace Foods.Domain.UserCases
     public class OrderUsecases : IOrderServicesPort
     {
         private readonly IOrderPersistencePort _orderPersistence;
+        private readonly IRestaurantPersistencePort _restaurantPersistence;
 
-        public OrderUsecases(IOrderPersistencePort orderPersistence)
+        public OrderUsecases(IOrderPersistencePort orderPersistence, IRestaurantPersistencePort restaurantPersistence)
         {
             _orderPersistence = orderPersistence;
+            _restaurantPersistence = restaurantPersistence;
         }
 
         public async Task<OrderModel> CreateOrder(OrderModel orderModel)
@@ -28,6 +30,13 @@ namespace Foods.Domain.UserCases
             }
 
             return await _orderPersistence.CreateOrder(orderModel);
+        }
+
+        public async Task<List<OrderModel>> GetOrders(OrderFiltersModel filters, int page, int count, long userId)
+        {
+            var restaurant = await _restaurantPersistence.GetRestaurantByEmployeeId(userId) ?? throw new UserIsNotAEmployeeException("You are not a employee");
+
+            return await _orderPersistence.GetOrders(filters, page, count, restaurant.Id);
         }
 
         private async Task ValidateOrder(OrderModel orderModel)

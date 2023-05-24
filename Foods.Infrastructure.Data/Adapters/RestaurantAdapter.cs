@@ -41,6 +41,16 @@ namespace Foods.Infrastructure.Data.Adapters
             return restaurantModel;
         }
 
+        public async Task<RestaurantModel?> GetRestaurantByEmployeeId(long employeeId)
+        {
+            var result = await (from employee in _foodContext.Restaurantemployees
+                          join restaurant in _foodContext.Restaurants on employee.RestaurantId equals restaurant.Id
+                          where employee.EmployeeId == employeeId
+                          select restaurant).FirstOrDefaultAsync();
+
+            return result == null ? null : RestaurantMapper.ToRestaurantModel(result);
+        }
+
         public async Task<List<ItemRestaurantModel>> GetRestaurants(int page, int count)
         {
             var skip = page > 1 ? count * (page - 1) : 0;

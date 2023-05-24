@@ -24,6 +24,7 @@ namespace Foods.Infrastructure.Data.Adapters
 
             await _foodContext.Orders.AddAsync(order);
 
+            await _foodContext.SaveChangesAsync();
 
 
             var orderDishes = OrderMapper.ToOrderDishes(orderModel.Dishes);
@@ -38,6 +39,26 @@ namespace Foods.Infrastructure.Data.Adapters
             orderModel.Dishes = OrderMapper.ToModel(orderDishes);
 
             return orderModel;
+        }
+
+        public async Task<List<OrderModel>> GetOrders(OrderFiltersModel filters, int page, int count, long restaurantId)
+        {
+            var skip = page > 1 ? count * (page - 1) : 0;
+
+            var orders = await _foodContext.Orders
+                                    .Where(d => d.RestaurantId == restaurantId && d.State == filters.State)
+                                    .Skip(skip)
+                                    .Take(count)
+                                    .ToListAsync();
+            var ordersModel = OrderMapper.ToModel(orders);
+
+            ordersModel.ForEach(o =>
+            {
+                var dishes = _foodContext.Orderdishes.Where(d => d.OrderId == o.Id).ToList();
+                o.Dishes = OrderMapper.ToModel(dishes);
+            });
+
+            return ordersModel;
         }
 
         public async Task<bool> HasClientOrders(long clientId)

@@ -84,6 +84,22 @@ namespace Foods.Infrastructure.Data.Tests.Adapters
                     State = OrderStates.Ready,
                     Date = DateTime.UtcNow,
                     RestaurantId = 1
+                },
+                new Order
+                {
+                    ChefId = 1,
+                    ClientId = 2,
+                    State = OrderStates.Pending,
+                    Date = DateTime.UtcNow,
+                    RestaurantId = 1
+                },
+                new Order
+                {
+                    ChefId = 1,
+                    ClientId = 2,
+                    State = OrderStates.Pending,
+                    Date = DateTime.UtcNow,
+                    RestaurantId = 1
                 }
             });
 
@@ -188,7 +204,7 @@ namespace Foods.Infrastructure.Data.Tests.Adapters
             Assert.AreEqual(1, order.Dishes.Count);
             Assert.AreEqual(4, order.Dishes[0].Cuantity);
             Assert.AreEqual(3, order.Dishes[0].DishId);
-            Assert.AreEqual(4, order.Dishes[0].OrderId);
+            Assert.AreEqual(6, order.Dishes[0].OrderId);
 
             await CleanUp();
         }
@@ -219,6 +235,42 @@ namespace Foods.Infrastructure.Data.Tests.Adapters
             var hasClientOrder = await adapter.HasClientOrders(6);
 
             Assert.IsFalse(hasClientOrder);
+
+            await CleanUp();
+        }
+
+        [TestMethod]
+        public async Task GetOrdersSuccessfullPageOne()
+        {
+            Setup();
+            await SeedDatabase();
+
+            var adapter = new OrderAdapter(_context);
+
+            var orders = await adapter.GetOrders(new OrderFiltersModel
+            {
+                State = OrderStates.Pending
+            }, 1, 2, 1);
+
+            Assert.AreEqual(2, orders.Count);
+
+            await CleanUp();
+        }
+
+        [TestMethod]
+        public async Task GetOrdersSuccessfullPageTwo()
+        {
+            Setup();
+            await SeedDatabase();
+
+            var adapter = new OrderAdapter(_context);
+
+            var orders = await adapter.GetOrders(new OrderFiltersModel
+            {
+                State = OrderStates.Pending
+            }, 2, 2, 1);
+
+            Assert.AreEqual(1, orders.Count);
 
             await CleanUp();
         }

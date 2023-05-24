@@ -24,6 +24,54 @@ namespace Foods.Infrastructure.API.Controllers
             _logger = logger;
         }
 
+        [HttpGet]
+        public async Task<IActionResult> GetOrders([FromBody] OrderFiltersRequest filters,
+                                                   [FromQuery] int page,
+                                                   [FromQuery] int count)
+        {
+            try
+            {
+                await ValidateToken();
+
+                var payload = GetPayload();
+
+                var orderResponse = await _orderServices.GetOrders(filters, page, count, payload.UserId);
+
+                return Ok(orderResponse);
+
+            }
+            catch (TokenIsNotValidException ex)
+            {
+                _logger.LogDebug(MessageUnauthorized, ex.Message);
+
+                return StatusCode(StatusCodes.Status401Unauthorized, new ApiResult
+                {
+                    StatusCode = StatusCodes.Status401Unauthorized,
+                    Message = $"Errors: {ex.Message}"
+                });
+            }
+            catch (UserIsNotAEmployeeException ex)
+            {
+                _logger.LogDebug(MessageForbbiden, ex.Message);
+
+                return StatusCode(StatusCodes.Status403Forbidden, new ApiResult
+                {
+                    StatusCode = StatusCodes.Status403Forbidden,
+                    Message = $"Errors: {ex.Message}"
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Something was wrong");
+
+                return StatusCode(StatusCodes.Status500InternalServerError, new ApiResult
+                {
+                    StatusCode = StatusCodes.Status500InternalServerError,
+                    Message = "Something was wrong"
+                });
+            }
+        }
+
         [HttpPost]
         public async Task<IActionResult> CreateOrder([FromBody] OrderRequestDTO orderRequest)
         {

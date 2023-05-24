@@ -28,5 +28,14 @@ namespace Foods.Application.Services
 
             return OrderMapper.ToResponse(order);
         }
+
+        public async Task<List<OrderResponseDTO>> GetOrders(OrderFiltersRequest filters, int page, int count, long userId)
+        {
+            var filtersModel = OrderMapper.ToModel(filters);
+
+            var orders = await _orderServicesPort.GetOrders(filtersModel, page, count, userId);
+
+            return OrderMapper.ToResponse(orders);
+        }
     }
 }
