@@ -8,6 +8,7 @@
         public string State { get; set; } = null!;
         public long ChefId { get; set; }
         public long RestaurantId { get; set; }
+        public string Code { get; set; }
         public List<OrderDishModel> Dishes { get; set; }
     }
 }

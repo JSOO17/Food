@@ -1,10 +1,5 @@
 ﻿using Foods.Domain.HttpClients.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http.Headers;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Foods.Domain.HttpClients
 {
@@ -23,14 +18,14 @@ namespace Foods.Domain.HttpClients
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(scheme, auth);
         }
 
-        public async Task<HttpResponseMessage> GetAsync(string ruta)
+        public async Task<HttpResponseMessage> GetAsync(string route)
         {
-            return await _httpClient.GetAsync(ruta);
+            return await _httpClient.GetAsync(route);
         }
 
-        public async Task<HttpResponseMessage> PostAsync(string ruta, HttpContent contenido)
+        public async Task<HttpResponseMessage> PostAsync(string route, HttpContent content)
         {
-            return await _httpClient.PostAsync(ruta, contenido);
+            return await _httpClient.PostAsync(route, content);
         }
     }
 }

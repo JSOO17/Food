@@ -1,5 +1,3 @@
-using FluentValidation;
-using FluentValidation.AspNetCore;
 using Foods.Application.Services;
 using Foods.Application.Services.Interfaces;
 using Foods.Domain.HttpClients;
@@ -42,7 +40,14 @@ builder.Services.AddTransient<IOrderServices, OrderServices>();
 
 builder.Services.AddHttpClient<IUserMicroHttpClient, UserMicroHttpClient>(client =>
 {
-    client.BaseAddress = new Uri("https://localhost:7019/");
+    var uri = builder.Configuration.GetValue<string>("UrlFoodUsers");
+    client.BaseAddress = new Uri(uri);
+});
+
+builder.Services.AddHttpClient<IMessengerHttpClient, MessengerHttpClient>(client =>
+{
+    var uri = builder.Configuration.GetValue<string>("UrlFoodMessages");
+    client.BaseAddress = new Uri(uri);
 });
 
 builder.Services.AddLogging();

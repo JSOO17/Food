@@ -26,7 +26,6 @@ namespace Foods.Infrastructure.Data.Adapters
 
             await _foodContext.SaveChangesAsync();
 
-
             var orderDishes = OrderMapper.ToOrderDishes(orderModel.Dishes);
 
             orderDishes.ForEach(d => d.OrderId = order.Id);
@@ -61,6 +60,14 @@ namespace Foods.Infrastructure.Data.Adapters
             return ordersModel;
         }
 
+        public async Task<string> GetOrderState(long id)
+        {
+            return await _foodContext.Orders
+                                        .Where(o => o.Id == id)
+                                        .Select(o => o.State)
+                                        .FirstOrDefaultAsync() ?? string.Empty;
+        }
+
         public async Task<bool> HasClientOrders(long clientId)
         {
             var states = new List<string>()
@@ -73,6 +80,56 @@ namespace Foods.Infrastructure.Data.Adapters
             return await _foodContext.Orders
                         .Where(o => o.ClientId == clientId && states.Contains(o.State))
                         .AnyAsync();
+        }
+
+        public async Task<OrderModel?> UpdateOrder(long id, OrderModel orderModel)
+        {
+            var order = await _foodContext.Orders.Where(dish => dish.Id == id).FirstOrDefaultAsync();
+
+            if (order != null)
+            {
+                order.State = orderModel.State;
+                order.ChefId = orderModel.ChefId;
+
+                _foodContext.Entry(order).State = EntityState.Modified;
+
+                await _foodContext.SaveChangesAsync();
+
+                return OrderMapper.ToModel(order);
+            }
+
+            return null;
+        }
+
+        public async Task<bool> CodeExists(string code)
+        {
+            return await _foodContext.Orders
+                               .Where(o => o.Code == code)
+                               .AnyAsync();
+        }
+
+        public async Task<bool> ValidateCode(long id, string code)
+        {
+            var codeOrder = await _foodContext.Orders
+                               .Where(o => o.Id == id)
+                               .Select(o => o.Code)
+                               .FirstOrDefaultAsync();
+
+            return code == codeOrder;
+        }
+
+        public async Task UpdateOrderCode(long id, string code)
+        {
+            var order = await _foodContext.Orders.Where(dish => dish.Id == id).FirstOrDefaultAsync();
+
+            if (order != null)
+            {
+                order.Code = code;
+
+                _foodContext.Entry(order).State = EntityState.Modified;
+
+                await _foodContext.SaveChangesAsync();
+            }
         }
     }
 }

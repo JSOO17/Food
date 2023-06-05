@@ -135,5 +135,71 @@ namespace Foods.Infrastructure.API.Controllers
                 });
             }
         }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateOrder(long id, [FromBody] OrderRequestDTO orderRequest)
+        {
+            try
+            {
+                await ValidateToken();
+
+                var payload = GetPayload();
+
+                var orderResponse = await _orderServices.UpdateOrder(id, orderRequest, payload.UserId, payload.Cellphone);
+
+                return Ok(orderResponse);
+
+            }
+            catch (TokenIsNotValidException ex)
+            {
+                _logger.LogDebug(MessageUnauthorized, ex.Message);
+
+                return StatusCode(StatusCodes.Status401Unauthorized, new ApiResult
+                {
+                    StatusCode = StatusCodes.Status401Unauthorized,
+                    Message = $"Errors: {ex.Message}"
+                });
+            }
+            catch (RoleHasNotPermissionException ex)
+            {
+                _logger.LogDebug(MessageForbbiden, ex.Message);
+
+                return StatusCode(StatusCodes.Status403Forbidden, new ApiResult
+                {
+                    StatusCode = StatusCodes.Status403Forbidden,
+                    Message = $"Errors: {ex.Message}"
+                });
+            }
+            catch (OrderStateChangeInvalidException ex)
+            {
+                _logger.LogDebug(MessageBadRequest, ex.Message);
+
+                return StatusCode(StatusCodes.Status400BadRequest, new ApiResult
+                {
+                    StatusCode = StatusCodes.Status400BadRequest,
+                    Message = $"Errors: {ex.Message}"
+                });
+            }
+            catch (OrderCodeInvalidException ex)
+            {
+                _logger.LogDebug(MessageBadRequest, ex.Message);
+
+                return StatusCode(StatusCodes.Status400BadRequest, new ApiResult
+                {
+                    StatusCode = StatusCodes.Status400BadRequest,
+                    Message = $"Errors: The code is invalid"
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Something was wrong");
+
+                return StatusCode(StatusCodes.Status500InternalServerError, new ApiResult
+                {
+                    StatusCode = StatusCodes.Status500InternalServerError,
+                    Message = "Something was wrong"
+                });
+            }
+        }
     }
 }

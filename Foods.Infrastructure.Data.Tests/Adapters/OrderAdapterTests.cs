@@ -66,7 +66,7 @@ namespace Foods.Infrastructure.Data.Tests.Adapters
                     ChefId = 1,
                     ClientId = 1,
                     State = OrderStates.Pending,
-                    Date = DateTime.UtcNow,
+                    Date = DateTime.Parse("2023-04-01"),
                     RestaurantId = 1
                 },
                 new Order
@@ -271,6 +271,31 @@ namespace Foods.Infrastructure.Data.Tests.Adapters
             }, 2, 2, 1);
 
             Assert.AreEqual(1, orders.Count);
+
+            await CleanUp();
+        }
+
+        [TestMethod]
+        public async Task UpdateOrderSuccess()
+        {
+            Setup();
+            await SeedDatabase();
+
+            var adapter = new OrderAdapter(_context);
+
+            var order = await adapter.UpdateOrder(1, new OrderModel
+            {
+                ChefId = 3,
+                RestaurantId = 1,
+                State = OrderStates.InPreparation,
+            });
+
+            Assert.IsNotNull(order);
+            Assert.AreEqual(1, order.ClientId);
+            Assert.AreEqual(DateTime.Parse("2023-04-01"), order.Date);
+            Assert.AreEqual(3, order.ChefId);
+            Assert.AreEqual(1, order.RestaurantId);
+            Assert.AreEqual(OrderStates.InPreparation, order.State);
 
             await CleanUp();
         }

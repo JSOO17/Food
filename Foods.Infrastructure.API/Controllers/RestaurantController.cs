@@ -15,7 +15,6 @@ namespace Foods.Infrastructure.API.Controllers
     {
         private readonly IRestaurantServices _restaurantServices;
         private readonly ILogger<RestaurantController> _logger;
-        private readonly IUserMicroHttpClient _userHttpClient;
 
         public RestaurantController(
                 IRestaurantServices restaurantServices,
@@ -25,7 +24,6 @@ namespace Foods.Infrastructure.API.Controllers
         {
             _restaurantServices = restaurantServices;
             _logger = logger;
-            _userHttpClient = userMicroHttpClient;
         }
 
         [HttpGet]

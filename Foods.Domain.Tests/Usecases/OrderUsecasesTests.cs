@@ -1,11 +1,11 @@
 ﻿using FluentValidation;
 using Foods.Domain.Exceptions;
+using Foods.Domain.HttpClients.Interfaces;
 using Foods.Domain.Interfaces.SPI;
 using Foods.Domain.Models;
 using Foods.Domain.UserCases;
 using Foods.Domain.Utils;
 using Moq;
-using System.Reflection;
 
 namespace Foods.Domain.Tests.Usecases
 {
@@ -17,8 +17,13 @@ namespace Foods.Domain.Tests.Usecases
         {
             var orderServicesPersistencePort = new Mock<IOrderPersistencePort>();
             var RestaurantServicesPersistencePort = new Mock<IRestaurantPersistencePort>();
+            var mockMessengerHttpClient = new Mock<IMessengerHttpClient>();
 
-            var useCases = new OrderUsecases(orderServicesPersistencePort.Object, RestaurantServicesPersistencePort.Object);
+            var useCases = new OrderUsecases(
+                orderServicesPersistencePort.Object, 
+                RestaurantServicesPersistencePort.Object,
+                mockMessengerHttpClient.Object
+            );
 
             orderServicesPersistencePort
                 .Setup(p => p.HasClientOrders(It.IsAny<long>()))
@@ -79,8 +84,13 @@ namespace Foods.Domain.Tests.Usecases
         {
             var orderServicesPersistencePort = new Mock<IOrderPersistencePort>();
             var restaurantServicesPersistencePort = new Mock<IRestaurantPersistencePort>();
+            var mockMessengerHttpClient = new Mock<IMessengerHttpClient>();
 
-            var useCases = new OrderUsecases(orderServicesPersistencePort.Object, restaurantServicesPersistencePort.Object);
+            var useCases = new OrderUsecases(
+                orderServicesPersistencePort.Object,
+                restaurantServicesPersistencePort.Object,
+                mockMessengerHttpClient.Object
+            );
 
             orderServicesPersistencePort
                 .Setup(p => p.HasClientOrders(It.IsAny<long>()))
@@ -130,9 +140,14 @@ namespace Foods.Domain.Tests.Usecases
         public async Task CreateOrderClientAlreadyHasOrder()
         {
             var orderServicesPersistencePort = new Mock<IOrderPersistencePort>();
-            var RestaurantServicesPersistencePort = new Mock<IRestaurantPersistencePort>();
+            var restaurantServicesPersistencePort = new Mock<IRestaurantPersistencePort>();
+            var mockMessengerHttpClient = new Mock<IMessengerHttpClient>();
 
-            var useCases = new OrderUsecases(orderServicesPersistencePort.Object, RestaurantServicesPersistencePort.Object);
+            var useCases = new OrderUsecases(
+                orderServicesPersistencePort.Object,
+                restaurantServicesPersistencePort.Object,
+                mockMessengerHttpClient.Object
+            );
 
             orderServicesPersistencePort
                 .Setup(p => p.HasClientOrders(It.IsAny<long>()))
@@ -184,12 +199,17 @@ namespace Foods.Domain.Tests.Usecases
         {
             var orderServicesPersistencePort = new Mock<IOrderPersistencePort>();
             var restaurantServicesPersistencePort = new Mock<IRestaurantPersistencePort>();
+            var mockMessengerHttpClient = new Mock<IMessengerHttpClient>();
 
-            var useCases = new OrderUsecases(orderServicesPersistencePort.Object, restaurantServicesPersistencePort.Object);
+            var useCases = new OrderUsecases(
+                orderServicesPersistencePort.Object,
+                restaurantServicesPersistencePort.Object,
+                mockMessengerHttpClient.Object
+            );
 
             restaurantServicesPersistencePort
                 .Setup(r => r.GetRestaurantByEmployeeId(It.IsAny<long>()))
-                .Returns(Task.FromResult(new RestaurantModel
+                .Returns(Task.FromResult<RestaurantModel?>(new RestaurantModel
                 {
                     Id = 1
                 }));
@@ -246,8 +266,13 @@ namespace Foods.Domain.Tests.Usecases
         {
             var orderServicesPersistencePort = new Mock<IOrderPersistencePort>();
             var restaurantServicesPersistencePort = new Mock<IRestaurantPersistencePort>();
+            var mockMessengerHttpClient = new Mock<IMessengerHttpClient>();
 
-            var useCases = new OrderUsecases(orderServicesPersistencePort.Object, restaurantServicesPersistencePort.Object);
+            var useCases = new OrderUsecases(
+                orderServicesPersistencePort.Object,
+                restaurantServicesPersistencePort.Object,
+                mockMessengerHttpClient.Object
+            );
 
             restaurantServicesPersistencePort
                 .Setup(r => r.GetRestaurantByEmployeeId(It.IsAny<long>()))
@@ -291,6 +316,326 @@ namespace Foods.Domain.Tests.Usecases
 
             Assert.IsNotNull(exception);
             Assert.AreEqual("You are not a employee", exception.Message);
+        }
+
+        [TestMethod]
+        public async Task UpdateOrderSuccess()
+        {
+            var orderServicesPersistencePort = new Mock<IOrderPersistencePort>();
+            var restaurantServicesPersistencePort = new Mock<IRestaurantPersistencePort>();
+            var mockMessengerHttpClient = new Mock<IMessengerHttpClient>();
+
+            var useCases = new OrderUsecases(
+                orderServicesPersistencePort.Object,
+                restaurantServicesPersistencePort.Object,
+                mockMessengerHttpClient.Object
+            );
+
+            restaurantServicesPersistencePort
+                .Setup(r => r.GetRestaurantByEmployeeId(It.IsAny<long>()))
+                .Returns(Task.FromResult<RestaurantModel?>(new RestaurantModel
+                {
+                    Id = 1
+                }));
+
+            orderServicesPersistencePort
+                .Setup(p => p.UpdateOrder(It.IsAny<long>(), It.IsAny<OrderModel>()))
+                .Returns(Task.FromResult<OrderModel?>(new OrderModel
+                {
+                    ClientId = 45,
+                    ChefId = 3,
+                    RestaurantId = 1,
+                    Date = DateTime.Parse("2023-04-01"),
+                    State = OrderStates.InPreparation,
+                    Dishes = new List<OrderDishModel>
+                    {
+                        new OrderDishModel
+                        {
+                            Cuantity = 4,
+                            DishId = 3
+                        }
+                    }
+                }));
+
+            var model = await useCases.UpdateOrder(1, new OrderModel
+            {
+                ChefId = 3,
+                RestaurantId = 1,
+                State = OrderStates.InPreparation
+            }, 2, "+3134141");
+
+            Assert.IsNotNull(model);
+            Assert.AreEqual(45, model.ClientId);
+            Assert.AreEqual(DateTime.Parse("2023-04-01"), model.Date);
+            Assert.AreEqual(3, model.ChefId);
+            Assert.AreEqual(1, model.RestaurantId);
+            Assert.AreEqual(OrderStates.InPreparation, model.State);
+        }
+
+        [TestMethod]
+        public async Task UpdateOrderUserIsNotAEmployee()
+        {
+            var orderServicesPersistencePort = new Mock<IOrderPersistencePort>();
+            var restaurantServicesPersistencePort = new Mock<IRestaurantPersistencePort>();
+            var mockMessengerHttpClient = new Mock<IMessengerHttpClient>();
+
+            var useCases = new OrderUsecases(
+                orderServicesPersistencePort.Object,
+                restaurantServicesPersistencePort.Object,
+                mockMessengerHttpClient.Object
+            );
+
+            restaurantServicesPersistencePort
+                .Setup(r => r.GetRestaurantByEmployeeId(It.IsAny<long>()))
+                .Returns(Task.FromResult<RestaurantModel?>(null));
+
+            orderServicesPersistencePort
+                .Setup(p => p.UpdateOrder(It.IsAny<long>(), It.IsAny<OrderModel>()))
+                .Returns(Task.FromResult<OrderModel?>(new OrderModel
+                {
+                    ClientId = 45,
+                    ChefId = 3,
+                    RestaurantId = 1,
+                    Date = DateTime.Parse("2023-04-01"),
+                    State = OrderStates.InPreparation,
+                    Dishes = new List<OrderDishModel>
+                    {
+                        new OrderDishModel
+                        {
+                            Cuantity = 4,
+                            DishId = 3
+                        }
+                    }
+                }));
+
+            var exception = await Assert.ThrowsExceptionAsync<UserIsNotAEmployeeException>(async () =>
+            {
+                await useCases.UpdateOrder(1, new OrderModel
+                {
+                    ChefId = 3,
+                    RestaurantId = 1,
+                    State = OrderStates.InPreparation
+                }, 2, "+13414");
+            });
+
+            Assert.IsNotNull(exception);
+            Assert.AreEqual("You are not a employee", exception.Message);
+        }
+
+        [TestMethod]
+        public async Task UpdateOrderUserIsNotAEmployeeRestaurant()
+        {
+            var orderServicesPersistencePort = new Mock<IOrderPersistencePort>();
+            var restaurantServicesPersistencePort = new Mock<IRestaurantPersistencePort>();
+            var mockMessengerHttpClient = new Mock<IMessengerHttpClient>();
+
+            var useCases = new OrderUsecases(
+                orderServicesPersistencePort.Object,
+                restaurantServicesPersistencePort.Object,
+                mockMessengerHttpClient.Object
+            );
+
+            restaurantServicesPersistencePort
+                .Setup(r => r.GetRestaurantByEmployeeId(It.IsAny<long>()))
+                .Returns(Task.FromResult<RestaurantModel?>(new RestaurantModel
+                {
+                    Id = 3
+                }));
+
+            orderServicesPersistencePort
+                .Setup(p => p.UpdateOrder(It.IsAny<long>(), It.IsAny<OrderModel>()))
+                .Returns(Task.FromResult<OrderModel?>(new OrderModel
+                {
+                    ChefId = 3,
+                    RestaurantId = 1,
+                    State = OrderStates.InPreparation,
+                }));
+
+            var exception = await Assert.ThrowsExceptionAsync<RoleHasNotPermissionException>(async () =>
+            {
+                await useCases.UpdateOrder(1, new OrderModel
+                {
+                    ChefId = 3,
+                    RestaurantId = 1,
+                    State = OrderStates.InPreparation
+                }, 2, "+1341413");
+            });
+
+            Assert.IsNotNull(exception);
+            Assert.AreEqual("You are not a employee of the restaurant", exception.Message);
+        }
+
+        [TestMethod]
+        public async Task UpdateOrderDoesNotExist()
+        {
+            var orderServicesPersistencePort = new Mock<IOrderPersistencePort>();
+            var restaurantServicesPersistencePort = new Mock<IRestaurantPersistencePort>();
+            var mockMessengerHttpClient = new Mock<IMessengerHttpClient>();
+
+            var useCases = new OrderUsecases(
+                orderServicesPersistencePort.Object,
+                restaurantServicesPersistencePort.Object,
+                mockMessengerHttpClient.Object
+            );
+
+            restaurantServicesPersistencePort
+                .Setup(r => r.GetRestaurantByEmployeeId(It.IsAny<long>()))
+                .Returns(Task.FromResult<RestaurantModel?>(new RestaurantModel
+                {
+                    Id = 1
+                }));
+
+            orderServicesPersistencePort
+                .Setup(p => p.UpdateOrder(It.IsAny<long>(), It.IsAny<OrderModel>()))
+                .Returns(Task.FromResult<OrderModel?>(null));
+
+            var exception = await Assert.ThrowsExceptionAsync<ResourceDoesNotExistException>(async () =>
+            {
+                await useCases.UpdateOrder(1, new OrderModel
+                {
+                    ChefId = 3,
+                    RestaurantId = 1,
+                    State = OrderStates.InPreparation
+                }, 2, "+31341");
+            });
+
+            Assert.IsNotNull(exception);
+        }
+
+        [TestMethod]
+        public async Task UpdateOrderChangeStateToDeliveredFromDiffReady()
+        {
+            var orderServicesPersistencePort = new Mock<IOrderPersistencePort>();
+            var restaurantServicesPersistencePort = new Mock<IRestaurantPersistencePort>();
+            var mockMessengerHttpClient = new Mock<IMessengerHttpClient>();
+
+            var useCases = new OrderUsecases(
+                orderServicesPersistencePort.Object,
+                restaurantServicesPersistencePort.Object,
+                mockMessengerHttpClient.Object
+            );
+
+            restaurantServicesPersistencePort
+                .Setup(r => r.GetRestaurantByEmployeeId(It.IsAny<long>()))
+                .Returns(Task.FromResult<RestaurantModel?>(new RestaurantModel
+                {
+                    Id = 1
+                }));
+
+            orderServicesPersistencePort
+                .Setup(p => p.UpdateOrder(It.IsAny<long>(), It.IsAny<OrderModel>()))
+                .Returns(Task.FromResult<OrderModel?>(new OrderModel
+                {
+                    ChefId = 3,
+                    RestaurantId = 1,
+                    State = OrderStates.InPreparation,
+                }));
+
+            var exception = await Assert.ThrowsExceptionAsync<OrderStateChangeInvalidException>(async () =>
+            {
+                await useCases.UpdateOrder(1, new OrderModel
+                {
+                    ChefId = 3,
+                    RestaurantId = 1,
+                    State = OrderStates.Delivered
+                }, 2, "3414");
+            });
+
+            Assert.IsNotNull(exception);
+            Assert.AreEqual("The order is not ready yet", exception.Message);
+        }
+
+        [TestMethod]
+        public async Task UpdateOrderChangeStateToCanceledFromDiffInPreparation()
+        {
+            var orderServicesPersistencePort = new Mock<IOrderPersistencePort>();
+            var restaurantServicesPersistencePort = new Mock<IRestaurantPersistencePort>();
+            var mockMessengerHttpClient = new Mock<IMessengerHttpClient>();
+
+            var useCases = new OrderUsecases(
+                orderServicesPersistencePort.Object,
+                restaurantServicesPersistencePort.Object,
+                mockMessengerHttpClient.Object
+            );
+
+            restaurantServicesPersistencePort
+                .Setup(r => r.GetRestaurantByEmployeeId(It.IsAny<long>()))
+                .Returns(Task.FromResult<RestaurantModel?>(new RestaurantModel
+                {
+                    Id = 1
+                }));
+
+            orderServicesPersistencePort
+                .Setup(p => p.UpdateOrder(It.IsAny<long>(), It.IsAny<OrderModel>()))
+                .Returns(Task.FromResult<OrderModel?>(new OrderModel
+                {
+                    ChefId = 3,
+                    RestaurantId = 1,
+                    State = OrderStates.Ready,
+                }));
+
+            var exception = await Assert.ThrowsExceptionAsync<OrderStateChangeInvalidException>(async () =>
+            {
+                await useCases.UpdateOrder(1, new OrderModel
+                {
+                    ChefId = 3,
+                    RestaurantId = 1,
+                    State = OrderStates.Canceled
+                }, 2, "+3141");
+            });
+
+            Assert.IsNotNull(exception);
+            Assert.AreEqual("The order is in preparation or ready rigth now", exception.Message);
+        }
+
+        [TestMethod]
+        public async Task UpdateOrderCodeInvalid()
+        {
+            var orderServicesPersistencePort = new Mock<IOrderPersistencePort>();
+            var restaurantServicesPersistencePort = new Mock<IRestaurantPersistencePort>();
+            var mockMessengerHttpClient = new Mock<IMessengerHttpClient>();
+
+            var useCases = new OrderUsecases(
+                orderServicesPersistencePort.Object,
+                restaurantServicesPersistencePort.Object,
+                mockMessengerHttpClient.Object
+            );
+
+            restaurantServicesPersistencePort
+                .Setup(r => r.GetRestaurantByEmployeeId(It.IsAny<long>()))
+                .Returns(Task.FromResult<RestaurantModel?>(new RestaurantModel
+                {
+                    Id = 1
+                }));
+
+            orderServicesPersistencePort
+                .Setup(p => p.ValidateCode(It.IsAny<long>(), It.IsAny<string>()))
+                .Returns(Task.FromResult(false));
+
+            orderServicesPersistencePort
+                .Setup(p => p.UpdateOrder(It.IsAny<long>(), It.IsAny<OrderModel>()))
+                .Returns(Task.FromResult<OrderModel?>(new OrderModel
+                {
+                    ChefId = 3,
+                    RestaurantId = 1,
+                    State = OrderStates.Delivered,
+                }));
+
+            orderServicesPersistencePort
+                .Setup(p => p.GetOrderState(It.IsAny<long>()))
+                .Returns(Task.FromResult(OrderStates.Ready));
+
+            var exception = await Assert.ThrowsExceptionAsync<OrderCodeInvalidException>(async () =>
+            {
+                await useCases.UpdateOrder(1, new OrderModel
+                {
+                    ChefId = 3,
+                    RestaurantId = 1,
+                    State = OrderStates.Delivered
+                }, 2, "+3141");
+            });
+
+            Assert.IsNotNull(exception);
         }
     }
 }

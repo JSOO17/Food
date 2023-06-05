@@ -101,5 +101,39 @@ namespace Foods.Application.Tests.Services
             Assert.AreEqual(3, orders[0].Dishes[0].DishId);
             Assert.AreEqual(4, orders[0].Dishes[0].OrderId);
         }
+
+        [TestMethod]
+        public async Task UpdateOrderSuccessfull()
+        {
+            var servicesPort = new Mock<IOrderServicesPort>();
+
+            servicesPort
+                .Setup(p => p.UpdateOrder(It.IsAny<long>(), It.IsAny<OrderModel>(), It.IsAny<long>(), It.IsAny<string>()))
+                .Returns(Task.FromResult(new OrderModel
+                {
+                    Id = 4,
+                    ClientId = 45,
+                    ChefId = 2,
+                    Date = DateTime.Parse("2023-04-01"),
+                    RestaurantId = 1,
+                    State = OrderStates.InPreparation
+                }));
+
+            var services = new OrderServices(servicesPort.Object);
+
+            var order = await services.UpdateOrder(1, new OrderRequestDTO()
+            {
+                ChefId = 1,
+                RestaurantId = 1,
+                State = OrderStates.Pending
+            }, 1, "+3131232");
+
+            Assert.IsNotNull(order);
+            Assert.AreEqual(45, order.ClientId);
+            Assert.AreEqual(DateTime.Parse("2023-04-01"), order.Date);
+            Assert.AreEqual(2, order.ChefId);
+            Assert.AreEqual(1, order.RestaurantId);
+            Assert.AreEqual(OrderStates.InPreparation, order.State);
+        }
     }
 }

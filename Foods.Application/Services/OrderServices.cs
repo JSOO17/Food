@@ -3,11 +3,6 @@ using Foods.Application.DTO.Response;
 using Foods.Application.Mappers;
 using Foods.Application.Services.Interfaces;
 using Foods.Domain.Interfaces.API;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Foods.Application.Services
 {
@@ -36,6 +31,15 @@ namespace Foods.Application.Services
             var orders = await _orderServicesPort.GetOrders(filtersModel, page, count, userId);
 
             return OrderMapper.ToResponse(orders);
+        }
+
+        public async Task<OrderResponseDTO> UpdateOrder(long id, OrderRequestDTO orderRequest, long userId, string cellphoneUser)
+        {
+            var model = OrderMapper.ToModel(orderRequest);
+
+            var order = await _orderServicesPort.UpdateOrder(id, model, userId, cellphoneUser);
+
+            return OrderMapper.ToResponse(order);
         }
     }
 }

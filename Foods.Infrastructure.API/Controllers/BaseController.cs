@@ -36,6 +36,7 @@ namespace Foods.Infrastructure.API.Controllers
             {
                 RoleId = int.Parse(GetClaim(ClaimTypes.Role, claims).Value),
                 UserId = int.Parse(GetClaim(ClaimTypes.NameIdentifier, claims).Value),
+                Cellphone = GetClaim(ClaimTypes.MobilePhone, claims).Value,
                 Email = GetClaim(ClaimTypes.Email, claims).Value
             };
         }

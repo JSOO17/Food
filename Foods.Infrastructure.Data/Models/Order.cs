@@ -9,6 +9,7 @@ namespace Foods.Infrastructure.Data.Models
         public long ClientId { get; set; }
         public DateTime Date { get; set; }
         public string State { get; set; } = null!;
+        public string? Code { get; set; }
         public long ChefId { get; set; }
         public long RestaurantId { get; set; }
 

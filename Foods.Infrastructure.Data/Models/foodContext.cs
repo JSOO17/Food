@@ -105,6 +105,8 @@ namespace Foods.Infrastructure.Data.Models
 
                 entity.Property(e => e.State).HasMaxLength(100);
 
+                entity.Property(e => e.Code).HasMaxLength(100);
+
                 entity.HasOne(d => d.Chef)
                     .WithMany(p => p.Orders)
                     .HasForeignKey(d => d.ChefId)
