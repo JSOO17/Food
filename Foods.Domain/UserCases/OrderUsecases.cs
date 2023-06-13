@@ -37,11 +37,11 @@ namespace Foods.Domain.UserCases
             return await _orderPersistence.CreateOrder(orderModel);
         }
 
-        public async Task<List<OrderModel>> GetOrders(OrderFiltersModel filters, int page, int count, long userId)
+        public async Task<List<OrderModel>> GetOrders(string state, int page, int count, long userId)
         {
             var restaurant = await _restaurantPersistence.GetRestaurantByEmployeeId(userId) ?? throw new UserIsNotAEmployeeException("You are not a employee");
 
-            return await _orderPersistence.GetOrders(filters, page, count, restaurant.Id);
+            return await _orderPersistence.GetOrders(state, page, count, restaurant.Id);
         }
 
         public async Task<OrderModel> UpdateOrder(long id, OrderModel orderModel, long userId, string cellphoneUser)

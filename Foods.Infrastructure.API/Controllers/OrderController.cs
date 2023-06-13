@@ -25,7 +25,7 @@ namespace Foods.Infrastructure.API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetOrders([FromBody] OrderFiltersRequest filters,
+        public async Task<IActionResult> GetOrders([FromQuery] string state,
                                                    [FromQuery] int page,
                                                    [FromQuery] int count)
         {
@@ -35,7 +35,7 @@ namespace Foods.Infrastructure.API.Controllers
 
                 var payload = GetPayload();
 
-                var orderResponse = await _orderServices.GetOrders(filters, page, count, payload.UserId);
+                var orderResponse = await _orderServices.GetOrders(state, page, count, payload.UserId);
 
                 return Ok(orderResponse);
 

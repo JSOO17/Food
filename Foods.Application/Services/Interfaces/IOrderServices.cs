@@ -8,6 +8,6 @@ namespace Foods.Application.Services.Interfaces
     {
         Task<OrderResponseDTO> CreateOrder(OrderRequestDTO order);
         Task<OrderResponseDTO> UpdateOrder(long id, OrderRequestDTO order, long userId, string cellphoneUser);
-        Task<List<OrderResponseDTO>> GetOrders(OrderFiltersRequest filters, int page, int count, long userId);
+        Task<List<OrderResponseDTO>> GetOrders(string state, int page, int count, long userId);
     }
 }

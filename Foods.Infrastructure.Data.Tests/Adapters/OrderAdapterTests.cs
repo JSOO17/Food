@@ -247,10 +247,7 @@ namespace Foods.Infrastructure.Data.Tests.Adapters
 
             var adapter = new OrderAdapter(_context);
 
-            var orders = await adapter.GetOrders(new OrderFiltersModel
-            {
-                State = OrderStates.Pending
-            }, 1, 2, 1);
+            var orders = await adapter.GetOrders(OrderStates.Pending, 1, 2, 1);
 
             Assert.AreEqual(2, orders.Count);
 
@@ -265,10 +262,7 @@ namespace Foods.Infrastructure.Data.Tests.Adapters
 
             var adapter = new OrderAdapter(_context);
 
-            var orders = await adapter.GetOrders(new OrderFiltersModel
-            {
-                State = OrderStates.Pending
-            }, 2, 2, 1);
+            var orders = await adapter.GetOrders(OrderStates.Pending, 2, 2, 1);
 
             Assert.AreEqual(1, orders.Count);
 

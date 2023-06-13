@@ -40,12 +40,12 @@ namespace Foods.Infrastructure.Data.Adapters
             return orderModel;
         }
 
-        public async Task<List<OrderModel>> GetOrders(OrderFiltersModel filters, int page, int count, long restaurantId)
+        public async Task<List<OrderModel>> GetOrders(string state, int page, int count, long restaurantId)
         {
             var skip = page > 1 ? count * (page - 1) : 0;
 
             var orders = await _foodContext.Orders
-                                    .Where(d => d.RestaurantId == restaurantId && d.State == filters.State)
+                                    .Where(d => d.RestaurantId == restaurantId && d.State == state)
                                     .Skip(skip)
                                     .Take(count)
                                     .ToListAsync();

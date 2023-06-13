@@ -6,6 +6,6 @@ namespace Foods.Domain.Interfaces.API
     {
         Task<OrderModel> CreateOrder(OrderModel orderModel);
         Task<OrderModel> UpdateOrder(long id, OrderModel orderModel, long userId, string cellphoneUser);
-        Task<List<OrderModel>> GetOrders(OrderFiltersModel filters, int page, int count, long userId);
+        Task<List<OrderModel>> GetOrders(string state, int page, int count, long userId);
     }
 }

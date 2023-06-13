@@ -219,7 +219,7 @@ namespace Foods.Domain.Tests.Usecases
                 .Returns(Task.FromResult(false));
 
             orderServicesPersistencePort
-                .Setup(p => p.GetOrders(It.IsAny<OrderFiltersModel>(), It.IsAny<int>(), It.IsAny<int>() , It.IsAny<long>()))
+                .Setup(p => p.GetOrders(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<int>() , It.IsAny<long>()))
                 .Returns(Task.FromResult(new List<OrderModel>
                 {
                     new OrderModel
@@ -242,10 +242,7 @@ namespace Foods.Domain.Tests.Usecases
                     }
                 }));
 
-            var orders = await useCases.GetOrders(new OrderFiltersModel
-            {
-                State = OrderStates.Pending
-            }, 1, 1, 1);
+            var orders = await useCases.GetOrders(OrderStates.Pending, 1, 1, 1);
 
             Assert.IsNotNull(orders);
             Assert.AreEqual(1, orders.Count);
@@ -283,7 +280,7 @@ namespace Foods.Domain.Tests.Usecases
                 .Returns(Task.FromResult(false));
 
             orderServicesPersistencePort
-                .Setup(p => p.GetOrders(It.IsAny<OrderFiltersModel>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<long>()))
+                .Setup(p => p.GetOrders(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<long>()))
                 .Returns(Task.FromResult(new List<OrderModel>
                 {
                     new OrderModel
@@ -308,10 +305,7 @@ namespace Foods.Domain.Tests.Usecases
 
             var exception = await Assert.ThrowsExceptionAsync<UserIsNotAEmployeeException>(async () =>
             {
-                await useCases.GetOrders(new OrderFiltersModel
-                {
-                    State = OrderStates.Pending
-                }, 1, 1, 1);
+                await useCases.GetOrders(OrderStates.Pending, 1, 1, 1);
             });
 
             Assert.IsNotNull(exception);
