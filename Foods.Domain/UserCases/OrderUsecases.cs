@@ -6,7 +6,6 @@ using Foods.Domain.Interfaces.SPI;
 using Foods.Domain.Models;
 using Foods.Domain.Utils;
 using Foods.Domain.Utils.Validators;
-using System.Reflection.Emit;
 
 namespace Foods.Domain.UserCases
 {
