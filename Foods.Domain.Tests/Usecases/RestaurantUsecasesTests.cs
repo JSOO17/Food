@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using Foods.Domain.Exceptions;
 using Foods.Domain.Interfaces.SPI;
 using Foods.Domain.Models;
 using Foods.Domain.UserCases;
@@ -115,6 +116,104 @@ namespace Foods.Domain.Tests.Usecases
             Assert.AreEqual(1, restaurants.Count);
             Assert.AreEqual("xdf", restaurants[0].Name);
             Assert.AreEqual("test.png", restaurants[0].UrlLogo);
+        }
+
+        [TestMethod]
+        public async Task CreateEmployeeRestaurantSuccessfull()
+        {
+            var servicesPersistencePort = new Mock<IRestaurantPersistencePort>();
+
+            var useCases = new RestaurantUsercases(servicesPersistencePort.Object);
+
+            servicesPersistencePort
+                .Setup(p => p.CreateEmployeeRestaurant(It.IsAny<RestaurantEmployeesModel>()))
+                .Returns(Task.FromResult(new RestaurantEmployeesModel
+                {
+                    EmployeeId = 1,
+                    RestaurantId = 3
+                }));
+
+            servicesPersistencePort
+                .Setup(p => p.IsOwnerByRestaurant(It.IsAny<long>(), It.IsAny<long>()))
+                .Returns(Task.FromResult(true));
+
+            var model = new RestaurantEmployeesModel
+            {
+                EmployeeId = 1,
+                RestaurantId = 3
+            };
+
+            var restaurantEmployee = await useCases.CreateEmployeeRestaurant(model, 1);
+
+            Assert.IsNotNull(restaurantEmployee);
+            Assert.AreEqual(3, restaurantEmployee.RestaurantId);
+            Assert.AreEqual(1, restaurantEmployee.EmployeeId);
+        }
+
+        [TestMethod]
+        public async Task CreateEmployeeRestaurantNotValid()
+        {
+            var servicesPersistencePort = new Mock<IRestaurantPersistencePort>();
+
+            var useCases = new RestaurantUsercases(servicesPersistencePort.Object);
+
+            servicesPersistencePort
+                .Setup(p => p.CreateEmployeeRestaurant(It.IsAny<RestaurantEmployeesModel>()))
+                .Returns(Task.FromResult(new RestaurantEmployeesModel
+                {
+                    RestaurantId = 3
+                }));
+
+            servicesPersistencePort
+                .Setup(p => p.IsOwnerByRestaurant(It.IsAny<long>(), It.IsAny<long>()))
+                .Returns(Task.FromResult(true));
+
+            var model = new RestaurantEmployeesModel
+            {
+                RestaurantId = 3
+            };
+
+            var exception = await Assert.ThrowsExceptionAsync<ValidationException>(async () =>
+            {
+                await useCases.CreateEmployeeRestaurant(model, 1);
+            });
+
+            Assert.IsNotNull(exception);
+            Assert.AreEqual("Validation failed: \r\n -- EmployeeId: The employeeId can not be empty. Severity: Error", exception.Message);
+        }
+
+        [TestMethod]
+        public async Task CreateEmployeeRestaurantUserIsNotOwner()
+        {
+            var servicesPersistencePort = new Mock<IRestaurantPersistencePort>();
+
+            var useCases = new RestaurantUsercases(servicesPersistencePort.Object);
+
+            servicesPersistencePort
+                .Setup(p => p.CreateEmployeeRestaurant(It.IsAny<RestaurantEmployeesModel>()))
+                .Returns(Task.FromResult(new RestaurantEmployeesModel
+                {
+                    RestaurantId = 3,
+                    EmployeeId = 1
+                }));
+
+            servicesPersistencePort
+                .Setup(p => p.IsOwnerByRestaurant(It.IsAny<long>(), It.IsAny<long>()))
+                .Returns(Task.FromResult(false));
+
+            var model = new RestaurantEmployeesModel
+            {
+                RestaurantId = 3,
+                EmployeeId = 1
+            };
+
+            var exception = await Assert.ThrowsExceptionAsync<RoleHasNotPermissionException>(async () =>
+            {
+                await useCases.CreateEmployeeRestaurant(model, 1);
+            });
+
+            Assert.IsNotNull(exception);
+            Assert.AreEqual("You are not the owner of the restaurant", exception.Message);
         }
     }
 }
