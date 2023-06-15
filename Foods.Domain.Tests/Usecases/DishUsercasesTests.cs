@@ -109,7 +109,7 @@ namespace Foods.Domain.Tests.Usecases
 
             servicesPersistencePort
                 .Setup(p => p.GetRestaurantByDishId(It.IsAny<long>()))
-                .Returns(Task.FromResult(new RestaurantModel
+                .Returns(Task.FromResult<RestaurantModel?>(new RestaurantModel
                 {
                     OwnerId = 1
                 }));
@@ -126,6 +126,8 @@ namespace Foods.Domain.Tests.Usecases
             };
 
             await useCases.UpdateDish(1, dishModel, 1);
+
+            Assert.IsTrue(servicesPersistencePort.CallBase);
         }
 
         [TestMethod]

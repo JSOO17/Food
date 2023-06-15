@@ -386,7 +386,7 @@ namespace Foods.Infrastructure.API.Tests.Controllers
                 .Returns(Task.FromResult(new HttpResponseMessage { StatusCode = HttpStatusCode.OK, Content = null }));
 
             mockServices
-                .Setup(p => p.GetOrders(It.IsAny<OrderFiltersRequest>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<long>()))
+                .Setup(p => p.GetOrders(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<long>()))
                 .Returns(Task.FromResult(new List<OrderResponseDTO>
                 {
                     new OrderResponseDTO
@@ -420,10 +420,7 @@ namespace Foods.Infrastructure.API.Tests.Controllers
                 }
             };
 
-            var response = (OkObjectResult)await controller.GetOrders(new OrderFiltersRequest
-            {
-                State = OrderStates.Pending,
-            }, 1, 1);
+            var response = (OkObjectResult)await controller.GetOrders(OrderStates.Pending, 1, 1);
 
             Assert.AreEqual(200, response.StatusCode);
             Assert.IsInstanceOfType(response.Value, typeof(List<OrderResponseDTO>));
@@ -456,7 +453,7 @@ namespace Foods.Infrastructure.API.Tests.Controllers
                 .Returns(Task.FromResult(new HttpResponseMessage { StatusCode = HttpStatusCode.Unauthorized, Content = null }));
 
             mockServices
-                .Setup(p => p.GetOrders(It.IsAny<OrderFiltersRequest>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<long>()))
+                .Setup(p => p.GetOrders(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<long>()))
                 .Returns(Task.FromResult(new List<OrderResponseDTO>
                 {
                     new OrderResponseDTO
@@ -490,10 +487,7 @@ namespace Foods.Infrastructure.API.Tests.Controllers
                 }
             };
 
-            var response = (ObjectResult)await controller.GetOrders(new OrderFiltersRequest
-            {
-                State = OrderStates.Pending,
-            }, 1, 1);
+            var response = (ObjectResult)await controller.GetOrders(OrderStates.Pending, 1, 1);
 
             Assert.AreEqual(401, response.StatusCode);
             Assert.IsInstanceOfType(response.Value, typeof(ApiResult));
@@ -517,7 +511,7 @@ namespace Foods.Infrastructure.API.Tests.Controllers
                 .Returns(Task.FromResult(new HttpResponseMessage { StatusCode = HttpStatusCode.OK, Content = null }));
 
             mockServices
-                .Setup(p => p.GetOrders(It.IsAny<OrderFiltersRequest>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<long>()))
+                .Setup(p => p.GetOrders(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<long>()))
                 .Throws(new Exception());
 
             var httpContext = new DefaultHttpContext();
@@ -531,10 +525,7 @@ namespace Foods.Infrastructure.API.Tests.Controllers
                 }
             };
 
-            var response = (ObjectResult)await controller.GetOrders(new OrderFiltersRequest
-            {
-                State = OrderStates.Pending,
-            }, 1, 1);
+            var response = (ObjectResult)await controller.GetOrders(OrderStates.Pending, 1, 1);
 
             Assert.AreEqual(500, response.StatusCode);
             Assert.IsInstanceOfType(response.Value, typeof(ApiResult));
