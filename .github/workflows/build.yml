@@ -5,6 +5,15 @@ on:
       - master
   pull_request:
     types: [opened, synchronize, reopened]
+env:
+  AWS_REGION: 'us-east-2'
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  AWS_ECR_REPO_NAME: 'food'
+  AWS_ECR_REPO_LINK: 'public.ecr.aws/l4u4k6t2/food'
+  AWS_ECR_REPO_PATH: 'public.ecr.aws/l4u4k6t2'
+  AWS_EB_ENVIRONMENT: 'food-dev'
+  AWS_EB_APPLICATION: 'Food'
 jobs:
   build:
     name: Build and analyze
@@ -45,7 +54,54 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         shell: powershell
         run: |
-          .\.sonar\scanner\dotnet-sonarscanner begin /k:"JSOO17_Food" /o:"jsoo17" /d:sonar.login="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.cs.vscoveragexml.reportsPaths=coverage.xml
-          dotnet build --no-incremental
-          dotnet-coverage collect "dotnet test" -f xml -o "coverage.xml"
-          .\.sonar\scanner\dotnet-sonarscanner end /d:sonar.login="${{ secrets.SONAR_TOKEN }}"
+            .\.sonar\scanner\dotnet-sonarscanner begin /k:"JSOO17_Food" /o:"jsoo17" /d:sonar.login="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.cs.vscoveragexml.reportsPaths=coverage.xml
+            dotnet build --no-incremental
+            dotnet-coverage collect "dotnet test" -f xml -o "coverage.xml"
+            .\.sonar\scanner\dotnet-sonarscanner end /d:sonar.login="${{ secrets.SONAR_TOKEN }}"
+
+  deploy-ecr:
+    #needs: build-and-test
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ env.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ env.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Build and push Docker image to ECR
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Build and push Docker image to ECR
+        run: |
+          aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${{env.AWS_ECR_REPO_PATH}}
+          docker build -t ${{env.AWS_ECR_REPO_NAME}} .
+          docker tag ${{env.AWS_ECR_REPO_NAME}}:latest ${{env.AWS_ECR_REPO_LINK}}:latest
+          docker push ${{env.AWS_ECR_REPO_LINK}}:latest
+  
+  
+  deploy-eb:
+    needs: deploy-ecr
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v3
+      - name: Generate deployment package
+        run: zip -r deploy.zip ./Dockerrun.aws.json
+      - name: Deploy to EB
+        uses: einaregilsson/beanstalk-deploy@v21
+        with:
+          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          application_name: ${{ env.AWS_EB_APPLICATION }}
+          environment_name: ${{ env.AWS_EB_ENVIRONMENT }}
+          version_label: 'latest'
+          region: ${{ env.AWS_REGION }}
+          deployment_package: deploy.zip         # only use for set the latest versions
+          #use_existing_version_if_available: true
